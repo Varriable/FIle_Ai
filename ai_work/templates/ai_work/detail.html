@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ file.name }}</h2>
+    <p class="text-muted">Uploaded on {{ file.uploaded_at|date:"M d, Y H:i" }}</p>
+
+    <hr>
+
+    <!-- AI Chat Form -->
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="question" class="form-label">Ask the AI a question about this document:</label>
+            <textarea name="question" id="question" rows="3" class="form-control" placeholder="Type your question here..." required></textarea>
+        </div>
+        <button type="submit" name="action" value="ask" class="btn btn-primary">Ask</button>
+        <button type="submit" name="action" value="summarize" class="btn btn-secondary">Summarize Now</button>
+    </form>
+
+    <hr>
+
+    <!-- Display AI Response -->
+    {% if ai_response %}
+        <div class="alert alert-info mt-3">
+            <h5>AI Response:</h5>
+            <p>{{ ai_response }}</p>
+        </div>
+    {% endif %}
+
+    <a href="{% url 'file_list' %}" class="btn btn-link mt-4">&larr; Back to My Files</a>
+</div>
+{% endblock %}

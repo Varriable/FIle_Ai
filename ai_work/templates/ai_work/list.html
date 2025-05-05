@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Your Uploaded Files</h2>
+        <a href="{% url 'upload_file' %}" class="btn btn-success">+ Upload New File</a>
+    </div>
+
+    {% if files %}
+        <div class="list-group">
+            {% for file in files %}
+                <a href="{% url 'file_detail' file.pk %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ file.name }}</strong><br>
+                        <small class="text-muted">Uploaded on {{ file.uploaded_at|date:"M d, Y H:i" }}</small>
+                    </div>
+                    <span class="badge bg-primary rounded-pill">View</span>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            You haven't uploaded any files yet.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
