@@ -1,0 +1,106 @@
+{% extends "ai_file/base.html" %}
+{% load crispy_forms_tags %}
+
+
+
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>{{ file.title }}</h2>
+        <small class="text-muted">Uploaded {{ file.uploaded_at|timesince }} ago</small>
+    </div>
+    
+    <div class="card-body">
+
+        <!--Input question-->
+        <div class=" p-3 m-1">
+            <input type="text">
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="mb-4" id="actionButtons">
+            <button onclick="handleSummarize()" class="btn btn-info" id="summarizeBtn">
+                <i class="fas fa-comment-alt"></i> Summarize
+            </button>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#askModal">
+                <i class="fas fa-question"></i> Ask Question
+            </button>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading" class="text-center" style="display: none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Analyzing document with AI...</p>
+        </div>
+
+        <!-- Analysis Results -->
+        <div id="analysisResults">
+            {% include 'ai_file/analysis_results.html' %}
+        </div>
+
+        <!-- Analysis Results -->
+        <div id="analysisResults">
+            {% for analysis in analyses %}
+            <div class="card mb-3" id="analysis-{{ analysis.id }}">
+                <div class="card-body">
+                    {% if analysis.query %}
+                    <h5 class="card-title">Q: {{ analysis.query }}</h5>
+                    <p class="card-text">{{ analysis.response }}</p>
+                    {% else %}
+                    <h5 class="card-title text-muted">Summary</h5>
+                    <p class="card-text">{{ analysis.response }}</p>
+                    {% endif %}
+                    <div class="ai-actions mt-3">
+                        <button class="btn btn-sm btn-outline-secondary copy-btn"
+                                data-text="{{ analysis.response }}">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary feedback-btn"
+                                data-analysis="{{ analysis.id }}">
+                            <i class="fas fa-thumbs-up"></i> Helpful
+                        </button>
+                    </div>
+                    <small class="text-muted">{{ analysis.created_at|date:"Y-m-d H:i" }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+function handleSummarize() {
+    const buttons = document.getElementById('actionButtons');
+    const loading = document.getElementById('loading');
+    
+    buttons.style.display = 'none';
+    loading.style.display = 'block';
+    
+    window.location.href = "?action=summarize";
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Scroll to anchor if present
+    if(window.location.hash) {
+        const element = document.querySelector(window.location.hash);
+        if(element) element.scrollIntoView({behavior: 'smooth'});
+    }
+
+    // Copy to clipboard functionality
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            navigator.clipboard.writeText(this.dataset.text)
+                .then(() => {
+                    this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                    }, 2000);
+                });
+        });
+    });
+});
+</script>
+{% endblock %}

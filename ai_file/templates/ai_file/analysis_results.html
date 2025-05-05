@@ -1,0 +1,22 @@
+{% if analyses %}
+<div class="analysis-results">
+    {% for analysis in analyses %}
+    <div class="card mb-3">
+        <div class="card-body">
+            {% if analysis.query %}
+            <h5 class="card-title">Q: {{ analysis.query }}</h5>
+            <p class="card-text">{{ analysis.response }}</p>
+            {% else %}
+            <h5 class="card-title text-muted">Summary</h5>
+            <p class="card-text">{{ analysis.response }}</p>
+            {% endif %}
+            <small class="text-muted">{{ analysis.created_at|date:"Y-m-d H:i" }}</small>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    No analysis performed yet. Use the buttons above to interact with AI.
+</div>
+{% endif %}
