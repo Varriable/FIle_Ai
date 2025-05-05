@@ -5,10 +5,11 @@ name = "pypi"
 
 [packages]
 django = "*"
-python-docx = "*"
-pypdf2 = "*"
 django-bootstrap-v5 = "*"
 django-widget-tweaks = "*"
+python-docx = "*"
+pypdf2 = "*"
+requests = "*"
 
 [dev-packages]
 
