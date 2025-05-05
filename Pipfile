@@ -6,10 +6,10 @@ name = "pypi"
 [packages]
 django = "*"
 django-bootstrap-v5 = "*"
-django-widget-tweaks = "*"
 python-docx = "*"
 pypdf2 = "*"
 requests = "*"
+django-widget-tweaks = "*"
 
 [dev-packages]
 
