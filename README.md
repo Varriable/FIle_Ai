@@ -1,8 +1,11 @@
 There are 2 different models (in their own branch) each with the same concepts. The esaiest and most refined being model 1
 
-To run this file: ~:Requirements
+To run this file:
 
-pienv
+~:Requirements
+
+1.pienv
+
 ~Process:
 
 1.run "pipenv shell" to activate the virtual environment
