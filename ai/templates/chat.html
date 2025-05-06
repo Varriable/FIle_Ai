@@ -1,0 +1,37 @@
+<form method="post" id="chatForm">
+    {% csrf_token %}
+    <label>Select File:</label>
+    <select name="file_id" required>
+      <option value="">-- choose a file --</option>
+      {% for f in files %}
+        <option value="{{ f.id }}" {% if f == selected_file %}selected{% endif %}>{{ f.original_name }}</option>
+      {% endfor %}
+    </select><br><br>
+  
+    <label>Enter your prompt:</label><br>
+    <textarea name="prompt" rows="4" cols="50" required>{{ prompt }}</textarea><br><br>
+  
+    <button type="submit">Send</button>
+</form>
+  
+  {% if reply %}
+  <h3>AI Response:</h3>
+  <div style="background:#eef; padding:15px; border-radius:8px; white-space:pre-wrap;">
+    {{ reply }}
+  </div>
+  {% endif %}
+
+
+  <script>
+    document.getElementById('chatForm').addEventListener('submit', function(e) {
+      const fileSelect = document.querySelector('select[name="file_id"]');
+      if (!fileSelect.value) {
+        e.preventDefault();
+        alert('Please select a file before sending your message.');
+      }
+    });
+  </script>
+  
+<p><a href="{% url 'landing' %}">⬅ Back to menu</a></p>
+
+
