@@ -1,31 +1,153 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-1">{{ file.name }}</h2>
-    <p class="text-muted">Uploaded on {{ file.uploaded_at|date:"M d, Y H:i" }}</p>
-    <hr>
-
-    <!-- AI Interaction Form -->
-    <form method="post">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="question" class="form-label">Ask AI a question about this file:</label>
-            <textarea name="question" id="question" class="form-control" rows="3" placeholder="Type your question here..." required></textarea>
+<div class="bg-white shadow sm:rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+        <div class="md:flex md:items-center md:justify-between">
+            <div class="flex-1 min-w-0">
+                <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+                    {{ file.name }}
+                </h2>
+                <div class="mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-6">
+                    <div class="mt-2 flex items-center text-sm text-gray-500">
+                        <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Uploaded on {{ file.uploaded_at|date:"M d, Y" }}
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="d-flex gap-2">
-            <button type="submit" name="action" value="ask" class="btn btn-primary">Ask</button>
-            <!-- <button type="submit" name="action" value="summarize" class="btn btn-secondary">Summarize Now</button> -->
-        </div>
-    </form>
 
-    {% if ai_response %}
-        <div class="alert alert-info mt-4">
-            <h5>AI Response:</h5>
-            <pre style="white-space: pre-wrap;">{{ ai_response }}</pre>
-        </div>
-    {% endif %}
+        <div class="mt-8 max-w-3xl">
+            <div class="space-y-6">
+                <!-- Quick Actions -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <form method="POST" class="inline" id="summarizeForm">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="summarize">
+                            <button type="submit" class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
+                                </svg>
+                                <span>Summarize Document</span>
+                            </button>
+                        </form>
+                        <a href="{{ file.file.url }}" target="_blank" class="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <svg class="mr-2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                            Download Original
+                        </a>
+                    </div>
+                </div>
 
-    <a href="{% url 'file_list' %}" class="btn btn-link mt-3">&larr; Back to My Files</a>
+                <!-- AI Interaction -->
+                <div class="bg-white rounded-lg border">
+                    <div class="p-4 sm:p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Ask AI about this document</h3>
+                        <form method="POST" class="space-y-4" id="questionForm">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="ask">
+                            <div>
+                                <label for="question" class="sr-only">Your question</label>
+                                <div class="mt-1">
+                                    <textarea
+                                        id="question"
+                                        name="question"
+                                        rows="3"
+                                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                        placeholder="Ask any question about the document..."
+                                    ></textarea>
+                                </div>
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                                    </svg>
+                                    <span>Ask Question</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Loading Animation -->
+                    <div id="loadingAnimation" class="hidden border-t border-gray-200">
+                        <div class="p-4 sm:p-6">
+                            <div class="flex items-center justify-center">
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                                <span class="ml-3 text-sm text-gray-600">AI is thinking...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Response -->
+                    <div id="aiResponse" class="{% if not ai_response %}hidden{% endif %} border-t border-gray-200">
+                        <div class="p-4 sm:p-6">
+                            <h4 class="text-lg font-medium text-gray-900 mb-2">AI Response</h4>
+                            <div class="bg-gray-50 rounded-lg p-4 prose max-w-none">
+                                {{ ai_response|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const questionForm = document.getElementById('questionForm');
+        const summarizeForm = document.getElementById('summarizeForm');
+        const loadingAnimation = document.getElementById('loadingAnimation');
+        const aiResponse = document.getElementById('aiResponse');
+
+        function showLoading() {
+            loadingAnimation.classList.remove('hidden');
+            aiResponse.classList.add('hidden');
+            // Disable all buttons while loading
+            document.querySelectorAll('button[type="submit"]').forEach(button => {
+                button.disabled = true;
+                // Store original text
+                button.dataset.originalHtml = button.innerHTML;
+                // Show loading state
+                button.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                `;
+            });
+        }
+
+        function hideLoading() {
+            loadingAnimation.classList.add('hidden');
+            // Re-enable all buttons
+            document.querySelectorAll('button[type="submit"]').forEach(button => {
+                button.disabled = false;
+                // Restore original text
+                button.innerHTML = button.dataset.originalHtml;
+            });
+        }
+
+        // Handle question form submission
+        questionForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            showLoading();
+            this.submit();
+        });
+
+        // Handle summarize form submission
+        summarizeForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            showLoading();
+            this.submit();
+        });
+    });
+</script>
 {% endblock %}
